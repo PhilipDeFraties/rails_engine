@@ -151,4 +151,105 @@ describe "Items API" do
     expect(items_merchant[:data][:relationships][:items][:data][0][:id]).to be_a(String)
     expect(items_merchant[:data][:relationships][:items][:data][0][:id]).to eq(item.id.to_s)
   end
+
+  it "can find a list of items from a query" do
+    item_names = ["Thing 1", "Thing 2", "Thing 3", "Name"]
+
+    item_names.each do |name|
+      create(:item, name: name)
+    end
+
+    get '/api/v1/items/find_all?name=ing'
+
+    items = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(items).to have_key(:data)
+    expect(items[:data]).to be_an(Array)
+    expect(Item.all.count).to eq(4)
+    expect(items[:data].count).to eq(3)
+
+    items[:data].each do |item|
+      expect(item).to have_key(:id)
+      expect(item[:id]).to be_an(String)
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to be_an(Integer)
+
+      expect(item).to have_key(:relationships)
+      expect(item[:relationships]).to be_a(Hash)
+
+      expect(item[:relationships]).to have_key(:merchant)
+      expect(item[:relationships][:merchant]).to be_a(Hash)
+
+      expect(item[:relationships][:merchant]).to have_key(:data)
+      expect(item[:relationships][:merchant][:data]).to be_a(Hash)
+
+      expect(item[:relationships][:merchant]).to have_key(:data)
+      expect(item[:relationships][:merchant][:data]).to be_a(Hash)
+
+      expect(item[:relationships][:merchant][:data]).to have_key(:id)
+      expect(item[:relationships][:merchant][:data][:id]).to be_a(String)
+    end
+  end
+
+  it "can find a single item from a query" do
+    item_names = ["Thing 1", "Thing 2", "Thing 3", "Name"]
+
+    item_names.each do |name|
+      create(:item, name: name)
+    end
+
+    get '/api/v1/items/find?name=ing'
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+    
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to be_an(String)
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to be_a(Float)
+
+    expect(item[:data][:attributes]).to have_key(:merchant_id)
+    expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+
+    expect(item[:data]).to have_key(:relationships)
+    expect(item[:data][:relationships]).to be_a(Hash)
+
+    expect(item[:data][:relationships]).to have_key(:merchant)
+    expect(item[:data][:relationships][:merchant]).to be_a(Hash)
+
+    expect(item[:data][:relationships][:merchant]).to have_key(:data)
+    expect(item[:data][:relationships][:merchant][:data]).to be_a(Hash)
+
+    expect(item[:data][:relationships][:merchant]).to have_key(:data)
+    expect(item[:data][:relationships][:merchant][:data]).to be_a(Hash)
+
+    expect(item[:data][:relationships][:merchant][:data]).to have_key(:id)
+    expect(item[:data][:relationships][:merchant][:data][:id]).to be_a(String)
+  end
 end
