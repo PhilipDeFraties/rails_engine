@@ -7,6 +7,8 @@ Rails.application.routes.draw do
         resource :merchants, only: %i[show], controller: 'items/merchants'
       end
       resources :merchants do
+        match 'find_all', via: %i[get], as: :find_all, on: :collection
+        match 'find', via: %i[get], as: :find, on: :collection
         resources :items, only: %i[index], controller: 'merchants/items'
       end
     end
