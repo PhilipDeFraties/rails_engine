@@ -105,4 +105,53 @@ describe "Merchants API" do
     expect(merchant.name).to_not eq(previous_name)
     expect(merchant.name).to eq("Globodyne")
   end
+
+  it "can get items for a merchant" do
+    merchant = create(:merchant)
+    10.times do
+      create(:item, merchant_id: merchant.id)
+    end
+
+    get "/api/v1/merchants/#{merchant.id}/items"
+
+    merchant_items = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(merchant_items).to have_key(:data)
+    expect(merchant_items[:data]).to be_an(Array)
+    expect(merchant_items[:data].count).to eq(10)
+
+    merchant_items[:data].each do |item|
+      expect(item).to have_key(:id)
+      expect(item[:id]).to be_a(String)
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to be_an(Integer)
+
+      expect(item).to have_key(:relationships)
+      expect(item[:relationships]).to be_a(Hash)
+
+      expect(item[:relationships]).to have_key(:merchant)
+      expect(item[:relationships][:merchant]).to be_a(Hash)
+
+      expect(item[:relationships][:merchant]).to have_key(:data)
+      expect(item[:relationships][:merchant][:data]).to be_a(Hash)
+
+      expect(item[:relationships][:merchant][:data]).to have_key(:id)
+      expect(item[:relationships][:merchant][:data][:id]).to be_a(String)
+    end
+  end
 end
