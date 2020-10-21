@@ -110,4 +110,45 @@ describe "Items API" do
     expect(item.name).to_not eq(previous_name)
     expect(item.name).to eq("Kick Pants")
   end
+
+  it "can get merchant for an item" do
+    merchant = create(:merchant)
+    item = create(:item, merchant_id: merchant.id)
+
+    get "/api/v1/items/#{item.id}/merchants"
+
+    items_merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(items_merchant).to have_key(:data)
+    expect(items_merchant[:data]).to be_an(Hash)
+
+    expect(items_merchant[:data]).to have_key(:id)
+    expect(items_merchant[:data][:id]).to be_a(String)
+    expect(items_merchant[:data][:id].to_i).to eq(merchant.id)
+
+    expect(items_merchant[:data]).to have_key(:attributes)
+    expect(items_merchant[:data][:attributes]).to be_a(Hash)
+
+    expect(items_merchant[:data][:attributes]).to have_key(:name)
+    expect(items_merchant[:data][:attributes][:name]).to be_a(String)
+    expect(items_merchant[:data][:attributes][:name]).to eq(merchant.name)
+
+    expect(items_merchant[:data]).to have_key(:relationships)
+    expect(items_merchant[:data][:relationships]).to be_a(Hash)
+
+    expect(items_merchant[:data][:relationships]).to have_key(:items)
+    expect(items_merchant[:data][:relationships][:items]).to be_a(Hash)
+
+    expect(items_merchant[:data][:relationships][:items]).to have_key(:data)
+    expect(items_merchant[:data][:relationships][:items][:data]).to be_an(Array)
+    expect(items_merchant[:data][:relationships][:items][:data].count).to eq(1)
+
+    expect(items_merchant[:data][:relationships][:items][:data][0]).to be_a(Hash)
+    expect(items_merchant[:data][:relationships][:items][:data][0]).to have_key(:id)
+
+    expect(items_merchant[:data][:relationships][:items][:data][0][:id]).to be_a(String)
+    expect(items_merchant[:data][:relationships][:items][:data][0][:id]).to eq(item.id.to_s)
+  end
 end
