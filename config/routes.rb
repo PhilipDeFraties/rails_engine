@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :items do
         match 'find_all', via: %i[get], as: :find_all, on: :collection
+        match 'find', via: %i[get], as: :find, on: :collection
         resource :merchants, only: %i[show], controller: 'items/merchants'
       end
       resources :merchants do
