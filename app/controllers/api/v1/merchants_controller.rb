@@ -28,8 +28,8 @@ class Api::V1::MerchantsController < ApplicationController
   end
 
   def find
-    merchant = Merchant.search(params["name"]).first
-    render json: MerchantSerializer.new(merchants)
+    merchant = Merchant.search(search_params).first
+    render json: MerchantSerializer.new(merchant)
   end
 
   private
