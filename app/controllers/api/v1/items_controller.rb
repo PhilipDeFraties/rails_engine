@@ -22,17 +22,23 @@ class Api::V1::ItemsController < ApplicationController
     render json: ItemSerializer.new(Item.update(params[:id], item_params))
   end
 
-  def find
-
+  def find_all
+    items = Item.search(search_params)
+    render json: ItemSerializer.new(items)
   end
 
-  def find_all
-
+  def find
+    item = Item.search(search_params).first
+    render json: ItemSerializer.new(item)
   end
 
   private
 
   def item_params
     params.permit(:name, :description, :unit_price, :merchant_id)
+  end
+
+  def search_params
+    params.permit(params.keys.first, params.values.first)
   end
 end
