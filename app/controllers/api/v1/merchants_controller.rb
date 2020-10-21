@@ -39,6 +39,6 @@ class Api::V1::MerchantsController < ApplicationController
   end
 
   def search_params
-    params.permit(params.keys.first, params.values.first)
+    params.permit("name")
   end
 end
