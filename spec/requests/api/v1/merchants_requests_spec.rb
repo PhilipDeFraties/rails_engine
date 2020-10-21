@@ -154,4 +154,79 @@ describe "Merchants API" do
       expect(item[:relationships][:merchant][:data][:id]).to be_a(String)
     end
   end
+
+  it "can find a list of merchants from a query" do
+    merchant_names = ["Merchant 1", "Merchant 2", "Merchant 3", "Name"]
+
+    merchant_names.each do |name|
+      create(:merchant, name: name)
+    end
+
+    get '/api/v1/merchants/find_all?name=ANT'
+
+    merchants = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(merchants).to have_key(:data)
+    expect(merchants[:data]).to be_an(Array)
+    expect(Merchant.all.count).to eq(4)
+    expect(merchants[:data].count).to eq(3)
+
+    merchants[:data].each do |merchant|
+      expect(merchant).to have_key(:id)
+      expect(merchant[:id]).to be_an(String)
+
+      expect(merchant).to have_key(:attributes)
+      expect(merchant[:attributes]).to be_a(Hash)
+
+      expect(merchant[:attributes]).to have_key(:name)
+      expect(merchant[:attributes][:name]).to be_a(String)
+
+      expect(merchant).to have_key(:relationships)
+      expect(merchant[:relationships]).to be_a(Hash)
+
+      expect(merchant[:relationships]).to have_key(:items)
+      expect(merchant[:relationships][:items]).to be_a(Hash)
+
+      expect(merchant[:relationships][:items]).to have_key(:data)
+      expect(merchant[:relationships][:items][:data]).to be_an(Array)
+    end
+  end
+
+  it "can find a single merchant from a query" do
+    merchant_names = ["Pete", "Peter", "Joe", "Bob"]
+
+    merchant_names.each do |name|
+      create(:merchant, name: name)
+    end
+
+    get '/api/v1/merchants/find?name=ETE'
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(merchant).to have_key(:data)
+    expect(merchant[:data]).to be_an(Hash)
+
+
+    expect(merchant[:data]).to have_key(:id)
+    expect(merchant[:data][:id]).to be_an(String)
+
+    expect(merchant[:data]).to have_key(:attributes)
+    expect(merchant[:data][:attributes]).to be_a(Hash)
+
+    expect(merchant[:data][:attributes]).to have_key(:name)
+    expect(merchant[:data][:attributes][:name]).to be_a(String)
+
+    expect(merchant[:data]).to have_key(:relationships)
+    expect(merchant[:data][:relationships]).to be_a(Hash)
+
+    expect(merchant[:data][:relationships]).to have_key(:items)
+    expect(merchant[:data][:relationships][:items]).to be_a(Hash)
+
+    expect(merchant[:data][:relationships][:items]).to have_key(:data)
+    expect(merchant[:data][:relationships][:items][:data]).to be_an(Array)
+  end
 end
