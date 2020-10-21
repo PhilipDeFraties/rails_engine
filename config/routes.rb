@@ -3,10 +3,13 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :items do
-        get :merchants
+        match 'find_all', via: %i[get], as: :find_all, on: :collection
+        resource :merchants, only: %i[show], controller: 'items/merchants'
       end
       resources :merchants do
-        get :items
+        match 'find_all', via: %i[get], as: :find_all, on: :collection
+        match 'find', via: %i[get], as: :find, on: :collection
+        resources :items, only: %i[index], controller: 'merchants/items'
       end
     end
   end
