@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         match 'find_all', via: %i[get], as: :find_all, on: :collection
         match 'find', via: %i[get], as: :find, on: :collection
         resources :items, only: %i[index], controller: 'merchants/items'
+        match 'most_revenue', via: %i[get], as: :most_revenue, on: :collection, controller: 'merchants/business_intelligence'
       end
     end
   end
